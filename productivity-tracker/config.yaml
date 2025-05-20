@@ -7,12 +7,12 @@ credentials:
     vidushi:
       email: vidushidhakad@gmail.com
       name: Vidushi Dhakad
-      password: "$2b$12$MlYxUvFy2PCAvFl2ukXKDuq3MgXLZ4MnY4IJYpNwGBGMLpmDCTkga"  # vid123
+      password: "$2b$12$fSL6qI/xU1mmp3WxIk7bnOzWvMC/fXNfSTJ8QHt.B1Xzy5rIptH1K"  # vid123
     pavitra:
       email: dasspavitra2007@example.com
       name: Pavitra Dass
-      password: "$2b$12$hCoxn3x9yk1djC7M9RGh/ebnNElkCu0Bt4LMVn2huYkXtG5M2TKiK"  # pav123
+      password: "$2b$12$rAFM2/vGxME9IaLjlSTZ6OvL2a9HqJENyJK7H2BOpQ.CGKx6QhwV."  # pav123
     sanya:
       email: jhaverisanya@gmail.com
       name: Sanya Jhaveri
-      password: "$2b$12$ZkgYdsAXZ86YAU7rWJDbO.Nc46qG0bRLF1KnKbNEXeZByhMKdx4f6"  # san123
+      password: "$2b$12$YZABccWTZItPh/rsFZ0uJOXJq1U5biZPNXuPbFbcKaXk3ZsMQ.NDK"  # san123
