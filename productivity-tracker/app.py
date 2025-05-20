@@ -39,8 +39,8 @@ if authentication_status:
         "Leetcode Practice": 5
     }
 
-    USER_DATA_PATH = f"data/data_{username}.xlsx"
     if username != "guest":
+        USER_DATA_PATH = f"data/data_{username}.xlsx"
         os.makedirs("data", exist_ok=True)
 
     if "custom_tasks" not in st.session_state:
@@ -49,6 +49,8 @@ if authentication_status:
         st.session_state.hidden_tasks = []
     if "task_index" not in st.session_state:
         st.session_state.task_index = 0
+    if username == "guest" and "guest_progress" not in st.session_state:
+        st.session_state.guest_progress = {task: 0 for task in BASE_TASKS.keys()}
 
     def get_all_tasks():
         base = BASE_TASKS.copy()
@@ -107,23 +109,29 @@ if authentication_status:
     if st.sidebar.button("Add Task"):
         if task_name and task_name not in all_tasks:
             st.session_state.custom_tasks[task_name] = int(task_target)
+            if username == "guest":
+                st.session_state.guest_progress[task_name] = 0
             st.success(f"Added '{task_name}' with target {task_target}. Please refresh.")
             st.rerun()
 
     if task_list:
         current_task = task_list[st.session_state.task_index]
         target = all_tasks[current_task]
-        current_value = 0 if username == "guest" else df[df["Date"] == today][current_task].values[0]
+        current_value = (st.session_state.guest_progress[current_task]
+                         if username == "guest"
+                         else df[df["Date"] == today][current_task].values[0])
 
         st.sidebar.subheader(f"⚙️ {current_task} Settings")
-        if username != "guest":
-            if st.sidebar.button("🔄 Reset Today"):
+        if st.sidebar.button("🔄 Reset Today"):
+            if username != "guest":
                 df.loc[df["Date"] == today, current_task] = 0
                 save_progress(df)
-                st.rerun()
-            if st.sidebar.button("🗑 Hide Task"):
-                st.session_state.hidden_tasks.append(current_task)
-                st.rerun()
+            else:
+                st.session_state.guest_progress[current_task] = 0
+            st.rerun()
+        if st.sidebar.button("🗑 Hide Task"):
+            st.session_state.hidden_tasks.append(current_task)
+            st.rerun()
 
     tab1, tab2 = st.tabs(["📋 Tracker", "📈 Data"])
 
@@ -156,6 +164,8 @@ if authentication_status:
                     if username != "guest":
                         df.loc[df["Date"] == today, current_task] = current_value + 1
                         save_progress(df)
+                    else:
+                        st.session_state.guest_progress[current_task] += 1
                     current_value += 1
                 if current_value == target:
                     st.balloons()
