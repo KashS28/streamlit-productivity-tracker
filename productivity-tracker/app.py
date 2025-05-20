@@ -8,7 +8,7 @@ TASKS = ["LinkedIn Connects", "Job Applications", "Leetcode Practice"]
 TASK_TARGETS = {"LinkedIn Connects": 50, "Job Applications": 50, "Leetcode Practice": 5}
 PROGRESS_FILE = "daily_progress.xlsx"
 
-# --- Initialize Excel ---
+# --- Excel Setup ---
 def initialize_excel():
     if not os.path.exists(PROGRESS_FILE):
         df = pd.DataFrame(columns=["Date"] + TASKS)
@@ -26,7 +26,7 @@ def load_today_progress():
 def save_progress(df):
     df.to_excel(PROGRESS_FILE, index=False)
 
-# --- Streamlit App ---
+# --- Streamlit Setup ---
 st.set_page_config("Productivity Tracker", layout="centered")
 st.title("🚀 Daily Productivity Tracker")
 
@@ -37,38 +37,61 @@ df, today = load_today_progress()
 if "task_index" not in st.session_state:
     st.session_state.task_index = 0
 if "count" not in st.session_state:
-    current_task = TASKS[st.session_state.task_index]
-    st.session_state.count = df[df["Date"] == today][current_task].values[0]
+    task = TASKS[st.session_state.task_index]
+    st.session_state.count = df[df["Date"] == today][task].values[0]
 
 # --- Tabs ---
 tab1, tab2 = st.tabs(["📋 Tracker", "📈 Data"])
 
 with tab1:
-    current_task = TASKS[st.session_state.task_index]
-    target = TASK_TARGETS[current_task]
-    
-    st.subheader(f"Task: {current_task}")
+    task = TASKS[st.session_state.task_index]
+    target = TASK_TARGETS[task]
+
+    st.subheader(f"Task: {task}")
     st.metric("Today's Progress", f"{st.session_state.count} / {target}")
 
-    if st.button("➕ Add 1"):
+    # --- Huge Centered Button ---
+    st.markdown(
+        """
+        <div style="display: flex; justify-content: center; margin: 30px 0;">
+            <form action="?add">
+                <button style="
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 20px 50px;
+                    font-size: 28px;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                " type="submit">➕ Add 1</button>
+            </form>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # --- Handle Increment via Query Param ---
+    query_params = st.experimental_get_query_params()
+    if "add" in query_params:
         if st.session_state.count < target:
             st.session_state.count += 1
-            df.loc[df["Date"] == today, current_task] = st.session_state.count
+            df.loc[df["Date"] == today, task] = st.session_state.count
             save_progress(df)
         if st.session_state.count == target:
-            st.success(f"🎉 YAYYY!! {current_task.upper()} DONE FOR THE DAY.")
+            st.success(f"🎉 YAYYY!! {task.upper()} DONE FOR THE DAY.")
+        st.experimental_set_query_params()  # clear ?add param
 
     col1, col2 = st.columns(2)
     with col1:
         if st.button("⏮ Go Back") and st.session_state.task_index > 0:
             st.session_state.task_index -= 1
-            prev_task = TASKS[st.session_state.task_index]
-            st.session_state.count = df[df["Date"] == today][prev_task].values[0]
+            task = TASKS[st.session_state.task_index]
+            st.session_state.count = df[df["Date"] == today][task].values[0]
     with col2:
         if st.button("⏭ Skip") and st.session_state.task_index < len(TASKS) - 1:
             st.session_state.task_index += 1
-            next_task = TASKS[st.session_state.task_index]
-            st.session_state.count = df[df["Date"] == today][next_task].values[0]
+            task = TASKS[st.session_state.task_index]
+            st.session_state.count = df[df["Date"] == today][task].values[0]
 
     st.caption("Progress resets automatically each new day.")
 
@@ -76,6 +99,5 @@ with tab2:
     st.subheader("📊 Daily Progress Data")
     st.dataframe(df.sort_values("Date", ascending=False), use_container_width=True)
 
-    # Optional Excel download
     with open(PROGRESS_FILE, "rb") as f:
         st.download_button("📥 Download Progress Sheet", f, file_name="daily_progress.xlsx")
