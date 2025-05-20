@@ -54,7 +54,7 @@ with tab1:
     st.markdown(
         """
         <div style="display: flex; justify-content: center; margin: 30px 0;">
-            <form action="?add">
+            <form action="?add=true">
                 <button style="
                     background-color: #4CAF50;
                     color: white;
@@ -71,16 +71,16 @@ with tab1:
     )
 
     # --- Handle Increment via Query Param ---
-    query_params = st.experimental_get_query_params()
-    if "add" in query_params:
+    if st.query_params.get("add") == "true":
         if st.session_state.count < target:
             st.session_state.count += 1
             df.loc[df["Date"] == today, task] = st.session_state.count
             save_progress(df)
         if st.session_state.count == target:
             st.success(f"🎉 YAYYY!! {task.upper()} DONE FOR THE DAY.")
-        st.experimental_set_query_params()  # clear ?add param
+        st.query_params.clear()  # Reset params after use
 
+    # --- Navigation Buttons ---
     col1, col2 = st.columns(2)
     with col1:
         if st.button("⏮ Go Back") and st.session_state.task_index > 0:
