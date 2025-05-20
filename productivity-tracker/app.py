@@ -8,7 +8,7 @@ import os
 from yaml.loader import SafeLoader
 
 # --- Load Auth Config ---
-with open("config.yaml") as file:
+with open("productivity-tracker/config.yaml") as file:
     config = yaml.load(file, Loader=SafeLoader)
 
 authenticator = stauth.Authenticate(
