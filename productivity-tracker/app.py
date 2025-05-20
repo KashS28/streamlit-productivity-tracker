@@ -10,6 +10,7 @@ from yaml.loader import SafeLoader
 # --- Load Auth Config ---
 with open("productivity-tracker/config.yaml") as file:
     config = yaml.load(file, Loader=SafeLoader)
+st.write(config["credentials"]["usernames"])
 
 authenticator = stauth.Authenticate(
     credentials=config["credentials"],
