@@ -3,16 +3,16 @@ credentials:
     kashish:
       email: kashishah2804@gmail.com
       name: Kashish Shah
-      password: "$2b$12$qWY6aN.KcQoR3N/VoHaTRuLTFKv6MH6FiXBdYhSlWkCHaVLx9gZny"
+      password: "$2b$12$qWY6aN.KcQoR3N/VoHaTRuLTFKv6MH6FiXBdYhSlWkCHaVLx9gZny"  # pass1234
     vidushi:
       email: vidushidhakad@gmail.com
       name: Vidushi Dhakad
-      password: "$2b$12$fAA8Q/XTChq12Hcm/0Cq3eXzybtzEGUGUZsUOf9AZMvqNsXbGdz4y"  # pass: vid123
+      password: "$2b$12$MlYxUvFy2PCAvFl2ukXKDuq3MgXLZ4MnY4IJYpNwGBGMLpmDCTkga"  # vid123
     pavitra:
       email: dasspavitra2007@example.com
       name: Pavitra Dass
-      password: "$2b$12$IdJv2tRCDEzjqcI/Ch9Z7OM3Io4IHf2ScmcRBR2YZXgAIuZkANjuG"  # pass: pav123
+      password: "$2b$12$hCoxn3x9yk1djC7M9RGh/ebnNElkCu0Bt4LMVn2huYkXtG5M2TKiK"  # pav123
     sanya:
       email: jhaverisanya@gmail.com
       name: Sanya Jhaveri
-      password: "$2b$12$gMZh9vU2Y0rs99m.MW9BQ.7jxpk3PyIj/TWwWxG9CM9LBzn4OaRJK"  # pass: san123
+      password: "$2b$12$ZkgYdsAXZ86YAU7rWJDbO.Nc46qG0bRLF1KnKbNEXeZByhMKdx4f6"  # san123
