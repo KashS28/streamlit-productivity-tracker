@@ -2,6 +2,6 @@ streamlit
 pandas
 openpyxl
 matplotlib
-streamlit-authenticator==0.4.2
+streamlit-authenticator==0.2.3
 PyYAML
 bcrypt
