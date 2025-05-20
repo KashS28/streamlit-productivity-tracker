@@ -10,21 +10,37 @@ from yaml.loader import SafeLoader
 # --- Load Auth Config ---
 with open("productivity-tracker/config.yaml") as file:
     config = yaml.load(file, Loader=SafeLoader)
-st.write(config["credentials"]["usernames"])
 
-authenticator = stauth.Authenticate(
-    credentials=config["credentials"],
-    cookie_name="tracker_cookie",
-    key="random_key",
-    cookie_expiry_days=1
-)
+# Modify credentials to allow login by email instead of username
+email_to_username = {}
+for user, data in config["credentials"]["usernames"].items():
+    email_to_username[data["email"]] = user
 
-# --- Login ---
-name, authentication_status, username = authenticator.login("Login", location="main")
+# Custom login interface using email
+st.sidebar.title("🔐 Email Login")
+email_input = st.sidebar.text_input("Email")
+password_input = st.sidebar.text_input("Password", type="password")
+
+username = email_to_username.get(email_input)
+authentication_status = None
+name = None
+
+if username:
+    # Set up the authenticator using mapped username
+    authenticator = stauth.Authenticate(
+        credentials=config["credentials"],
+        cookie_name="tracker_cookie",
+        key="random_key",
+        cookie_expiry_days=1
+    )
+    name, authentication_status, username = authenticator.login("Login", location="main", username=username, password=password_input)
+else:
+    if email_input and password_input:
+        st.sidebar.error("Invalid email or password")
 
 # --- Option to continue without login ---
 if authentication_status is None:
-    if st.button("🚪 Skip Login (Progress won't be saved)"):
+    if st.sidebar.button("🚪 Skip Login (Progress won't be saved)"):
         authentication_status = "guest"
         username = "guest"
         name = "Guest"
@@ -206,6 +222,6 @@ if authentication_status:
                 st.download_button("📥 Download Excel", f, file_name=f"{username}_progress.xlsx")
 
 elif authentication_status is False:
-    st.error("Incorrect username or password")
+    st.error("Incorrect email or password")
 elif authentication_status is None:
     st.warning("Please enter your login details")
