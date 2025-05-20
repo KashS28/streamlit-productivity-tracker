@@ -21,17 +21,27 @@ authenticator = stauth.Authenticate(
 # --- Login ---
 name, authentication_status, username = authenticator.login("Login", location="main")
 
+# --- Option to continue without login ---
+if authentication_status is None:
+    if st.button("🚪 Skip Login (Progress won't be saved)"):
+        authentication_status = "guest"
+        username = "guest"
+        name = "Guest"
+
 if authentication_status:
-    authenticator.logout("Logout", location="sidebar")
-    st.sidebar.success(f"Logged in as {name}")
+    if authentication_status != "guest":
+        authenticator.logout("Logout", location="sidebar")
+        st.sidebar.success(f"Logged in as {name}")
 
     BASE_TASKS = {
         "LinkedIn Connects": 50,
         "Job Applications": 50,
         "Leetcode Practice": 5
     }
+
     USER_DATA_PATH = f"data/data_{username}.xlsx"
-    os.makedirs("data", exist_ok=True)
+    if username != "guest":
+        os.makedirs("data", exist_ok=True)
 
     if "custom_tasks" not in st.session_state:
         st.session_state.custom_tasks = {}
@@ -75,8 +85,13 @@ if authentication_status:
         return recent[["Date"] + tasks]
 
     all_tasks = get_all_tasks()
-    initialize_excel(all_tasks)
-    df, today = load_today_progress(all_tasks)
+    if username != "guest":
+        initialize_excel(all_tasks)
+        df, today = load_today_progress(all_tasks)
+    else:
+        df = pd.DataFrame(columns=["Date"] + list(all_tasks.keys()))
+        today = datetime.now().strftime('%Y-%m-%d')
+
     visible_tasks = [t for t in all_tasks if t not in st.session_state.hidden_tasks]
     task_list = visible_tasks
 
@@ -98,16 +113,17 @@ if authentication_status:
     if task_list:
         current_task = task_list[st.session_state.task_index]
         target = all_tasks[current_task]
-        current_value = df[df["Date"] == today][current_task].values[0]
+        current_value = 0 if username == "guest" else df[df["Date"] == today][current_task].values[0]
 
         st.sidebar.subheader(f"⚙️ {current_task} Settings")
-        if st.sidebar.button("🔄 Reset Today"):
-            df.loc[df["Date"] == today, current_task] = 0
-            save_progress(df)
-            st.rerun()
-        if st.sidebar.button("🗑 Hide Task"):
-            st.session_state.hidden_tasks.append(current_task)
-            st.rerun()
+        if username != "guest":
+            if st.sidebar.button("🔄 Reset Today"):
+                df.loc[df["Date"] == today, current_task] = 0
+                save_progress(df)
+                st.rerun()
+            if st.sidebar.button("🗑 Hide Task"):
+                st.session_state.hidden_tasks.append(current_task)
+                st.rerun()
 
     tab1, tab2 = st.tabs(["📋 Tracker", "📈 Data"])
 
@@ -115,7 +131,6 @@ if authentication_status:
         if task_list:
             current_task = task_list[st.session_state.task_index]
             target = all_tasks[current_task]
-            current_value = df[df["Date"] == today][current_task].values[0]
 
             st.header(f"📍 Task: {current_task}")
             st.metric("Today's Progress", f"{current_value} / {target}")
@@ -138,8 +153,9 @@ if authentication_status:
 
             if st.button("➕ Add 1"):
                 if current_value < target:
-                    df.loc[df["Date"] == today, current_task] = current_value + 1
-                    save_progress(df)
+                    if username != "guest":
+                        df.loc[df["Date"] == today, current_task] = current_value + 1
+                        save_progress(df)
                     current_value += 1
                 if current_value == target:
                     st.balloons()
@@ -159,7 +175,7 @@ if authentication_status:
 
     with tab2:
         st.subheader("📊 Weekly Progress Chart")
-        if visible_tasks:
+        if username != "guest" and visible_tasks:
             chart_data = get_weekly_chart_data(visible_tasks)
             chart_data_grouped = chart_data.groupby("Date").sum().reset_index()
 
@@ -173,10 +189,10 @@ if authentication_status:
             st.pyplot(fig)
 
         st.subheader("📅 Full Daily Log")
-        st.dataframe(df.sort_values("Date", ascending=False), use_container_width=True)
-
-        with open(USER_DATA_PATH, "rb") as f:
-            st.download_button("📥 Download Excel", f, file_name=f"{username}_progress.xlsx")
+        if username != "guest":
+            st.dataframe(df.sort_values("Date", ascending=False), use_container_width=True)
+            with open(USER_DATA_PATH, "rb") as f:
+                st.download_button("📥 Download Excel", f, file_name=f"{username}_progress.xlsx")
 
 elif authentication_status is False:
     st.error("Incorrect username or password")
