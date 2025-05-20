@@ -3,4 +3,16 @@ credentials:
     kashish:
       email: kashishah2804@gmail.com
       name: Kashish Shah
-      password: "$2b$12$qWY6aN.KcQoR3N/VoHaTRuLTFKv6MH6FiXBdYhSlWkCHaVLx9gZny"  # password: pass1234
+      password: "$2b$12$qWY6aN.KcQoR3N/VoHaTRuLTFKv6MH6FiXBdYhSlWkCHaVLx9gZny"
+    vidushi:
+      email: vidushidhakad@gmail.com
+      name: Vidushi Dhakad
+      password: "$2b$12$fAA8Q/XTChq12Hcm/0Cq3eXzybtzEGUGUZsUOf9AZMvqNsXbGdz4y"  # pass: vid123
+    pavitra:
+      email: dasspavitra2007@example.com
+      name: Pavitra Dass
+      password: "$2b$12$IdJv2tRCDEzjqcI/Ch9Z7OM3Io4IHf2ScmcRBR2YZXgAIuZkANjuG"  # pass: pav123
+    sanya:
+      email: jhaverisanya@gmail.com
+      name: Sanya Jhaveri
+      password: "$2b$12$gMZh9vU2Y0rs99m.MW9BQ.7jxpk3PyIj/TWwWxG9CM9LBzn4OaRJK"  # pass: san123
