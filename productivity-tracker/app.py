@@ -8,28 +8,23 @@ import os
 from yaml.loader import SafeLoader
 
 # --- Load Auth Config ---
-with open("productivity-tracker/config.yaml") as file:
+with open("config.yaml") as file:
     config = yaml.load(file, Loader=SafeLoader)
 
 authenticator = stauth.Authenticate(
-    config["credentials"],
-    "tracker_cookie",
-    "random_key",
+    credentials=config["credentials"],
+    cookie_name="tracker_cookie",
+    key="random_key",
     cookie_expiry_days=1
 )
 
+# --- Login ---
 name, authentication_status, username = authenticator.login("Login", location="main")
 
-if authentication_status is False:
-    st.error("Incorrect username or password")
-elif authentication_status is None:
-    st.warning("Please enter your login details")
-elif authentication_status:
-
-    authenticator.logout("Logout", "sidebar")
+if authentication_status:
+    authenticator.logout("Logout", location="sidebar")
     st.sidebar.success(f"Logged in as {name}")
 
-    # --- Constants ---
     BASE_TASKS = {
         "LinkedIn Connects": 50,
         "Job Applications": 50,
@@ -38,7 +33,6 @@ elif authentication_status:
     USER_DATA_PATH = f"data/data_{username}.xlsx"
     os.makedirs("data", exist_ok=True)
 
-    # --- Session State Init ---
     if "custom_tasks" not in st.session_state:
         st.session_state.custom_tasks = {}
     if "hidden_tasks" not in st.session_state:
@@ -80,14 +74,12 @@ elif authentication_status:
         recent = df[df["Date"] >= datetime.now() - timedelta(days=6)]
         return recent[["Date"] + tasks]
 
-    # --- Task Data ---
     all_tasks = get_all_tasks()
     initialize_excel(all_tasks)
     df, today = load_today_progress(all_tasks)
     visible_tasks = [t for t in all_tasks if t not in st.session_state.hidden_tasks]
     task_list = visible_tasks
 
-    # --- Sidebar ---
     st.sidebar.title("📌 Your Tasks")
     for i, task in enumerate(task_list):
         if st.sidebar.button(task):
@@ -117,7 +109,6 @@ elif authentication_status:
             st.session_state.hidden_tasks.append(current_task)
             st.rerun()
 
-    # --- Main Tabs ---
     tab1, tab2 = st.tabs(["📋 Tracker", "📈 Data"])
 
     with tab1:
@@ -186,3 +177,8 @@ elif authentication_status:
 
         with open(USER_DATA_PATH, "rb") as f:
             st.download_button("📥 Download Excel", f, file_name=f"{username}_progress.xlsx")
+
+elif authentication_status is False:
+    st.error("Incorrect username or password")
+elif authentication_status is None:
+    st.warning("Please enter your login details")
